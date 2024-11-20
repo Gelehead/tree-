@@ -17,15 +17,12 @@ TP3.Render = {
 			const translationMatrix = new THREE.Matrix4();
 			translationMatrix.set(1, 0, 0, 0, 0, 1, 0, length/2, 0, 0, 1, 0, 0, 0, 0, 1);
 			cylinder.applyMatrix(translationMatrix);
-			cylinder.rotateOnWorldAxis(ax, ang);
-
-			//cylinder.translateX(node.a0);
-			//cylinder.translateZ(node.a0);
-			console.log(node.p0);
+			const rotationMatrix = new THREE.Matrix4();
+			rotationMatrix.makeRotationAxis(ax, ang);
+			cylinder.applyMatrix(rotationMatrix);
 			const translationMatrix2 = new THREE.Matrix4();
 			translationMatrix2.set(1, 0, 0, node.p0.x, 0, 1, 0, node.p0.y, 0, 0, 1, node.p0.z, 0, 0, 0, 1);
 			cylinder.applyMatrix(translationMatrix2);
-			//TP3.Geometry.translate(cylinder, node.p0);
 			scene.add(cylinder);
 		}
 
