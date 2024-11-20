@@ -89,4 +89,11 @@ TP3.Geometry = {
 
 		return mp.divideScalar(points.length);
 	},
+
+	translate: function(o, v){
+		o.translateX(v.x);
+		o.translateY(v.y);
+		o.translateZ(v.z);
+	},
+
 };

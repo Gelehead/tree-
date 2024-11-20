@@ -3,6 +3,38 @@ TP3.Render = {
 		//TODO
 		// size of the first cylinder (trunk), will be divided depending on number of "subtrunk"
 		baseSize = 10;
+
+		TP3.Geometry.simplifySkeleton(rootNode);
+		function drawCylinder(node, scene, alpha, radialDivisions, leavesCutoff, leavesDensity, applesProbability, matrix){
+			const length = Math.sqrt(Math.pow(node.p1.x - node.p0.x, 2) + Math.pow(node.p1.x - node.p0.x, 2) + Math.pow(node.p1.y - node.p0.y, 2) + Math.pow(node.p1.z - node.p0.z, 2));
+			const geometry = new THREE.CylinderGeometry(node.a1, node.a0, length, radialDivisions);
+			const material = new THREE.MeshLambertMaterial({color: 0x8B5A2B});
+			const cylinder = new THREE.Mesh( geometry, material );
+
+			const a = new THREE.Vector3(0, 1, 0);
+			const [ax, ang] = TP3.Geometry.findRotation(a, new THREE.Vector3(node.p1.x - node.p0.x, node.p1.y - node.p0.y, node.p1.z - node.p0.z));
+
+			const translationMatrix = new THREE.Matrix4();
+			translationMatrix.set(1, 0, 0, 0, 0, 1, 0, length/2, 0, 0, 1, 0, 0, 0, 0, 1);
+			cylinder.applyMatrix(translationMatrix);
+			cylinder.rotateOnWorldAxis(ax, ang);
+
+			//cylinder.translateX(node.a0);
+			//cylinder.translateZ(node.a0);
+			console.log(node.p0);
+			const translationMatrix2 = new THREE.Matrix4();
+			translationMatrix2.set(1, 0, 0, node.p0.x, 0, 1, 0, node.p0.y, 0, 0, 1, node.p0.z, 0, 0, 0, 1);
+			cylinder.applyMatrix(translationMatrix2);
+			//TP3.Geometry.translate(cylinder, node.p0);
+			scene.add(cylinder);
+		}
+
+		if(rootNode){
+			drawCylinder(rootNode, scene, alpha, radialDivisions, leavesCutoff, leavesDensity, applesProbability, matrix);
+			for(var i = 0; i < rootNode.childNode.length; i++){
+				this.drawTreeRough(rootNode.childNode[i], scene, alpha, radialDivisions, leavesCutoff, leavesDensity, applesProbability, matrix);
+			}
+		}
 	},
 
 	drawTreeHermite: function (rootNode, scene, alpha, leavesCutoff = 0.1, leavesDensity = 10, applesProbability = 0.05, matrix = new THREE.Matrix4()) {
