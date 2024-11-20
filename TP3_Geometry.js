@@ -54,7 +54,32 @@ TP3.Geometry = {
 	},
 
 	hermite: function (h0, h1, v0, v1, t) {
-		//TODO
+		// calculating pt
+		var p0 = 2 * Math.pow(t, 3) - 3 * Math.pow(t, 2) + 1;
+		var p1 = -2 * Math.pow(t, 3) - 3 * Math.pow(t, 2);
+		var r0 = Math.pow(t, 3) - 2*Math.pow(t, 2) + t;
+		var r1 = Math.pow(t, 3) - Math.pow(t, 2);
+
+		pt = h0 * p0
+		   + h1 * p1
+		   + v0 * r0
+		   + v1 * r1
+	 	;
+
+		// calculating dt
+		var dp0 = 6 * Math.pow(t, 2) - 6 * t;
+		var dp1 = -6 * Math.pow(t, 2) + 6 * t;
+		var dr0 = 3 * Math.pow(t, 2) - 4 * t + 1;
+		var dr1 = 3 * Math.pow(t, 2) - 2 * t;
+
+		dpt = h0 * dp0
+		   + h1 * dp1
+		   + v0 * dr0
+		   + v1 * dr1
+	 	;
+
+		return [pt, dpt]
+
 	},
 
 
@@ -72,6 +97,15 @@ TP3.Geometry = {
 		const angle = Math.acos(c);
 
 		return [axis, angle];
+	},
+
+	// returns the distance between the 2 points a and b (the length of the ab segment)
+	length : function ( a, b ) {
+		return MATH.sqrt(
+			(a.x - b.x)*(a.x - b.x) - 
+			(a.y - b.y)*(a.y - b.y) - 
+			(a.z - b.z)*(a.z - b.z)
+		);
 	},
 
 	// Projeter un vecteur a sur b
