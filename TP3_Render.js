@@ -1,37 +1,99 @@
 TP3.Render = {
 	drawTreeRough: function (rootNode, scene, alpha, radialDivisions = 8, leavesCutoff = 0.1, leavesDensity = 10, applesProbability = 0.05, matrix = new THREE.Matrix4()) {
-		//TODO
-		// size of the first cylinder (trunk), will be divided depending on number of "subtrunk"
-		baseSize = 10;
 
 		TP3.Geometry.simplifySkeleton(rootNode);
-		function drawCylinder(node, scene, alpha, radialDivisions, leavesCutoff, leavesDensity, applesProbability, matrix){
-			const length = Math.sqrt(Math.pow(node.p1.x - node.p0.x, 2) + Math.pow(node.p1.x - node.p0.x, 2) + Math.pow(node.p1.y - node.p0.y, 2) + Math.pow(node.p1.z - node.p0.z, 2));
-			const geometry = new THREE.CylinderGeometry(node.a1, node.a0, length, radialDivisions);
-			const material = new THREE.MeshLambertMaterial({color: 0x8B5A2B});
-			const cylinder = new THREE.Mesh( geometry, material );
 
+		// Computing leaf position
+		function leafPosition(length, final){
+			//REWORK NEEDED LEAVES GO TOO FAR AWAY
+			const r = alpha/2 * Math.sqrt(Math.random());
+			let f = 0;
+			if(final)
+				f = Math.random()*length;
+			const a = Math.random() * 2 * Math.PI;
+			return new THREE.Vector3(Math.cos(a)*r, (Math.random()*length*2) - length + f, Math.sin(a)*r);
+		}
+
+		function getCylinder(node){
+			// Parameters
+			const branchVector = new THREE.Vector3().subVectors(node.p1, node.p0);
+			const length = branchVector.length();
+			const cylinder = new THREE.CylinderBufferGeometry(node.a1, node.a0, length, radialDivisions);
+
+			// Computing rotation parameters
 			const a = new THREE.Vector3(0, 1, 0);
-			const [ax, ang] = TP3.Geometry.findRotation(a, new THREE.Vector3(node.p1.x - node.p0.x, node.p1.y - node.p0.y, node.p1.z - node.p0.z));
+			const [ax, ang] = TP3.Geometry.findRotation(a, branchVector);
 
+			// Transformation matrix
 			const translationMatrix = new THREE.Matrix4();
 			translationMatrix.set(1, 0, 0, 0, 0, 1, 0, length/2, 0, 0, 1, 0, 0, 0, 0, 1);
-			cylinder.applyMatrix(translationMatrix);
 			const rotationMatrix = new THREE.Matrix4();
 			rotationMatrix.makeRotationAxis(ax, ang);
-			cylinder.applyMatrix(rotationMatrix);
 			const translationMatrix2 = new THREE.Matrix4();
 			translationMatrix2.set(1, 0, 0, node.p0.x, 0, 1, 0, node.p0.y, 0, 0, 1, node.p0.z, 0, 0, 0, 1);
-			cylinder.applyMatrix(translationMatrix2);
-			scene.add(cylinder);
+
+			// Application of transformation
+			const transformationMatrix = new THREE.Matrix4;
+			transformationMatrix.multiply(translationMatrix2);
+			transformationMatrix.multiply(rotationMatrix);
+			transformationMatrix.multiply(translationMatrix);
+
+			cylinder.applyMatrix4(transformationMatrix);
+
+			const leaves = [];
+
+			// Creation of leaves
+			if(node.a1 <alpha*leavesCutoff){
+				for(let j = 0; j < leavesDensity; j++){
+					const leafPos = leafPosition(length, node.childNode.length === 0);
+					const mat2 = new THREE.Matrix4();
+					mat2.set(1, 0, 0, leafPos.x, 0, 1, 0, leafPos.y, 0, 0, 1, leafPos.z, 0, 0, 0,1);
+					const leafGeometry = new THREE.PlaneBufferGeometry(alpha, alpha);
+					leafGeometry.rotateX(Math.random()*Math.PI);
+					leafGeometry.rotateY(Math.random()*Math.PI);
+					leafGeometry.rotateZ(Math.random()*Math.PI);
+					leafGeometry.applyMatrix(transformationMatrix);
+					leafGeometry.applyMatrix(mat2);
+					leaves.push(leafGeometry);
+				}
+			}
+
+
+			return [[cylinder], leaves];
+
 		}
 
-		if(rootNode){
-			drawCylinder(rootNode, scene, alpha, radialDivisions, leavesCutoff, leavesDensity, applesProbability, matrix);
-			for(var i = 0; i < rootNode.childNode.length; i++){
-				this.drawTreeRough(rootNode.childNode[i], scene, alpha, radialDivisions, leavesCutoff, leavesDensity, applesProbability, matrix);
+		// Recursion of tree creation
+		function getTreeGeometry(node){
+			var branches = [], leaves =  [];
+			if(node){
+				[branches, leaves] = getCylinder(node, scene, alpha, radialDivisions);
+				for(let i = 0; i < node.childNode.length; i++){
+					const [lc, lv] = getTreeGeometry(node.childNode[i], scene, alpha, radialDivisions);
+					branches = branches.concat(lc);
+					leaves = leaves.concat(lv)
+				}
 			}
+			return [branches, leaves]
 		}
+
+
+		// Fusion of geometries
+		const [Tgeometries, Lgeometries] = getTreeGeometry(rootNode, scene, alpha, radialDivisions);
+
+		const treeGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(Tgeometries, false);
+		const leavesGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(Lgeometries, false);
+
+		// Creation of meshes
+		const bmat = new THREE.MeshLambertMaterial({color: 0x8B5A2B});
+		const lmat = new THREE.MeshPhongMaterial({color: 0x3A5F0B});
+		const tree = new THREE.Mesh(treeGeometry, bmat);
+		const leavesMesh = new THREE.Mesh(leavesGeometry, lmat)
+
+		// Displaying tree and leaves
+		scene.add(tree);
+		scene.add(leavesMesh);
+
 	},
 
 	drawTreeHermite: function (rootNode, scene, alpha, leavesCutoff = 0.1, leavesDensity = 10, applesProbability = 0.05, matrix = new THREE.Matrix4()) {
