@@ -50,7 +50,51 @@ TP3.Geometry = {
 	
 
 	generateSegmentsHermite: function (rootNode, lengthDivisions = 4, radialDivisions = 8) {
-		//TODO
+		if ( rootNode.parentNode == null ) {
+			this.generateSegmentsHermite(rootNode.childNode[0]);
+			return rootNode;
+		} else {
+			for (let i = 0; i < rootNode.childNode.length; i++) {
+				this.generateSegmentsHermite(rootNode.childNode[i]);
+			}
+			p = rootNode.parentNode;
+			gp = p.parentNode;
+
+			h0 = rootNode.p0;
+			h1 = gp.p0;
+
+			let v0 = new THREE.Vector3(
+				rootNode.p1.x - rootNode.p0.x,
+				rootNode.p1.y - rootNode.p0.y,
+				rootNode.p1.z - rootNode.p0.z
+			);
+			
+			let v1 = new THREE.Vector3(
+				gp.p1.x - gp.p0.x,
+				gp.p1.y - gp.p0.y,
+				gp.p1.z - gp.p0.z
+			);
+
+			for (let t = 0; t < 1; t += 1/lengthDivisions) {
+				// point coordinates (p) and speed (dp) at t [0,1] on the curve
+				p, dp = this.hermite(h0, h1, v0, v1, t);
+				dp = normalize(dp);
+				// arbitrary vector to get normal vectors
+				let r = new Vector3(0,0,1);
+				var n1 = normalize(cross(r,dp));
+				var n2 = normalize(cross(dp, n1));
+
+				//get the points around the radialDivision sided polygon
+				var lengthI = 0;
+				var theta = 0;
+				for (let i = 0; i < radialDivisions ; i++){
+					theta = (2*Math.PI*i) / radialDivisions;
+					// linear interpolation of radius
+					lengthI = (i)*rootNode.a1 + (1-i)*gp.a0;
+					rootNode.sections.append(p + lengthI*(Math.cos(theta)*n1 + Math.sin(theta) * n2));
+				}
+			}
+		}
 	},
 
 	hermite: function (h0, h1, v0, v1, t) {
