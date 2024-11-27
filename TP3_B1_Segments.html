@@ -32,6 +32,9 @@
 		const nodeTree = TP3.Lindenmayer.generateSkeleton(grammar, data.theta, data.alpha, data.decay);
 
 		TP3.Geometry.simplifySkeleton(nodeTree);
+		TP3.Render.drawTreeNodes(nodeTree, scene);
+		TP3.Render.drawTreeSkeleton(nodeTree, scene);
+		TP3.Geometry.gothroughtree(nodeTree);
 		TP3.Geometry.generateSegmentsHermite(nodeTree, lengthDivisions, radialDivisions);
 		TP3.Render.drawTreeSegments(nodeTree, scene);
 	</script>
