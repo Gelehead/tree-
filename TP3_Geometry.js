@@ -102,31 +102,44 @@ TP3.Geometry = {
 					pointList.push(pt.clone().add(offset));
 				}
 				if (!rootNode.sections) rootNode.sections = [];
-				rootNode.sections.push(pointList);
+				child.sections.push(pointList);
 			}
+		}
+		for ( let i = 0; i < rootNode.childNode.length ; i++ ) {
+			let child = rootNode.childNode[i];
+			this.generateSegmentsHermite(child);
 		}
 	},
 
 
 	generateSegmentsHermite_______________: function (rootNode, lengthDivisions = 4, radialDivisions = 8) {
-		if (rootNode.parentNode == null) {
+		if (false) {
 			for (let i = 0; i < rootNode.childNode.length; i++) {
-				this.generateSegmentsHermite(rootNode.childNode[0]);
+				this.generateSegmentsHermite_______________(rootNode.childNode[i]);
 			}
 		} else {
 			for (let i = 0; i < rootNode.childNode.length; i++) {
-				this.generateSegmentsHermite(rootNode.childNode[i]);
+				this.generateSegmentsHermite_______________(rootNode.childNode[i]);
 			}
-	
+
 			let p = rootNode.parentNode;
-			let h0 = rootNode.p1.clone();
-			let h1 = p.p0.clone();
+			let h0 = rootNode.p0.clone();
+			let h1 = rootNode.p1.clone();
 
 			console.log("h1", h1);
 	
 			// potentiel probleme
-			let v0 = rootNode.p0.clone().sub(rootNode.p1).normalize();
-			let v1 = p.p0.clone().sub(p.p1).normalize();
+
+			let v1 = rootNode.p1.clone().sub(rootNode.p0).normalize();
+			let v0, pa0;
+			if(p == null){
+				v0 = v1;
+				pa0 = rootNode.a0;
+			}
+			else{
+				v0 = p.p1.clone().sub(p.p0).normalize();
+				pa0 = p.a0;
+			}
 			for (let t = 0; t <= 1; t += 1 / lengthDivisions) {
 				let { p: pt, dp } = this.hermite(h0, h1, v0, v1, t);
 
@@ -145,7 +158,7 @@ TP3.Geometry = {
 				for (let i = 0; i < radialDivisions; i++) {
 					let theta = (2 * Math.PI * i) / radialDivisions;
 					let lengthI = ((radialDivisions - i) / radialDivisions) * rootNode.a1 + 
-								  (i / radialDivisions) * p.a0;
+								  (i / radialDivisions) * pa0;
 	
 					let offset = n1.clone().multiplyScalar(Math.cos(theta) * lengthI)
 						.add(n2.clone().multiplyScalar(Math.sin(theta) * lengthI));
