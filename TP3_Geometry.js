@@ -36,6 +36,10 @@ TP3.Geometry = {
 			if (Math.abs(v1.dot(v2) - 1) <= rotationThreshold) {
 				rootNode.p1 = sonNode.p1;
 				rootNode.a1 = sonNode.a1;
+
+				for (let i = 0; i < rootNode.childNode.length; i++){
+					rootNode.childNode[i].parentNode = rootNode;
+				}
 	
 				const index = rootNode.childNode.indexOf(sonNode);
 				if (index !== -1) rootNode.childNode.splice(index, 1);
@@ -49,17 +53,65 @@ TP3.Geometry = {
 	},
 
 	gothroughtree: function (rootNode){
-		console.log(rootNode);
+		//console.log(rootNode);
 		for (let i = 0; i < rootNode.childNode.length; i++) {
 			this.gothroughtree(rootNode.childNode[i]);
 		}
 	},
 	
+	// version bottom up
+	generateSegmentsHermite: function (rootNode, lengthDivisions = 4, radialDivisions = 8) { 
+		for ( let i = 0; i < rootNode.childNode.length ; i++ ) {
+			var child = rootNode.childNode[i]
+			console.log(child);
 
-	generateSegmentsHermite: function (rootNode, lengthDivisions = 4, radialDivisions = 8) {
+			// start of hermite : p0 of first node
+			let h0 = rootNode.p0.clone();
+			// end of hermite : p1 of 2nd node
+			let h1 = child.p1.clone();
+
+			// speed vectors
+			let v0 = rootNode.p1.clone().sub(rootNode.p0).normalize();
+			let v1 = child.p1.clone().sub(child.p0).normalize();
+
+
+			// construct circles around curve
+			for (let t = 0; t <= 1; t += 1 / lengthDivisions) {
+				let { p: pt, dp } = this.hermite(h0, h1, v0, v1, t);
+				
+				dp.normalize();
+
+				// take any non colinear vector to construct circle
+				let r = new THREE.Vector3(0, 0, 1);
+				if (Math.abs(dp.dot(r)) > 0.99) {
+					r.set(1, 0, 0); 
+				}
+
+				// vertical and horizontal components 
+				let n1 = new THREE.Vector3().crossVectors(r, dp).normalize();
+				let n2 = new THREE.Vector3().crossVectors(dp, n1).normalize();
+
+				let pointList = [];
+				for (let i = 0; i < radialDivisions; i++) {
+					let theta = (2 * Math.PI * i) / radialDivisions;
+					let lengthI = ((radialDivisions - i) / radialDivisions) * rootNode.a1 + 
+								(i / radialDivisions) * child.a0;
+
+					let offset = n1.clone().multiplyScalar(Math.cos(theta) * lengthI)
+						.add(n2.clone().multiplyScalar(Math.sin(theta) * lengthI));
+					pointList.push(pt.clone().add(offset));
+				}
+				if (!rootNode.sections) rootNode.sections = [];
+				rootNode.sections.push(pointList);
+			}
+		}
+	},
+
+
+	generateSegmentsHermite_______________: function (rootNode, lengthDivisions = 4, radialDivisions = 8) {
 		if (rootNode.parentNode == null) {
 			for (let i = 0; i < rootNode.childNode.length; i++) {
-				this.generateSegmentsHermite(rootNode.childNode[i]);
+				this.generateSegmentsHermite(rootNode.childNode[0]);
 			}
 		} else {
 			for (let i = 0; i < rootNode.childNode.length; i++) {
@@ -75,7 +127,6 @@ TP3.Geometry = {
 			// potentiel probleme
 			let v0 = rootNode.p0.clone().sub(rootNode.p1).normalize();
 			let v1 = p.p0.clone().sub(p.p1).normalize();
-	
 			for (let t = 0; t <= 1; t += 1 / lengthDivisions) {
 				let { p: pt, dp } = this.hermite(h0, h1, v0, v1, t);
 
@@ -105,35 +156,39 @@ TP3.Geometry = {
 			}
 		}
 	},
-	
+
 
 	hermite: function (h0, h1, v0, v1, t) {
+		// Pre-compute powers of t
+		let t2 = t * t;
+		let t3 = t2 * t;
 	
-		// Calculate pt
-		let p0 = 2 * Math.pow(t, 3) - 3 * Math.pow(t, 2) + 1;
-		let p1 = -2 * Math.pow(t, 3) + 3 * Math.pow(t, 2);
-		let r0 = Math.pow(t, 3) - 2 * Math.pow(t, 2) + t;
-		let r1 = Math.pow(t, 3) - Math.pow(t, 2);
+		// Hermite basis functions
+		let p0 = 2 * t3 - 3 * t2 + 1;
+		let p1 = -2 * t3 + 3 * t2;
+		let r0 = t3 - 2 * t2 + t;
+		let r1 = t3 - t2;
 	
+		// Derivatives of the Hermite basis functions
+		let dp0 = 6 * t2 - 6 * t;
+		let dp1 = -6 * t2 + 6 * t;
+		let dr0 = 3 * t2 - 4 * t + 1;
+		let dr1 = 3 * t2 - 2 * t;
+	
+		// Calculate position (pt) and derivative (dpt)
 		let pt = h0.clone().multiplyScalar(p0)
 			.add(h1.clone().multiplyScalar(p1))
 			.add(v0.clone().multiplyScalar(r0))
 			.add(v1.clone().multiplyScalar(r1));
 	
-		// Calculate dpt
-		let dp0 = (6 * Math.pow(t, 2)) - (6 * t);
-		let dp1 = (-6 * Math.pow(t, 2)) + (6 * t);
-		let dr0 = (3 * Math.pow(t, 2)) - (4 * t) + 1;
-		let dr1 = (3 * Math.pow(t, 2)) - (2 * t);
-	
 		let dpt = h0.clone().multiplyScalar(dp0)
 			.add(h1.clone().multiplyScalar(dp1))
 			.add(v0.clone().multiplyScalar(dr0))
-			.add(v1.clone().multiplyScalar(dr1))
-		;
-
-		return { p: pt, dp: dpt }; // Return as an object for clarity
+			.add(v1.clone().multiplyScalar(dr1));
+	
+		return { p: pt, dp: dpt }; // Return position and tangent
 	},
+	
 	
 
 
