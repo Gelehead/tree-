@@ -58,115 +58,47 @@ TP3.Geometry = {
 			this.gothroughtree(rootNode.childNode[i]);
 		}
 	},
-	
-	// version bottom up
-	generateSegmentsHermite: function (rootNode, lengthDivisions = 4, radialDivisions = 8) { 
-		for ( let i = 0; i < rootNode.childNode.length ; i++ ) {
-			var child = rootNode.childNode[i]
-			console.log(child);
 
-			// start of hermite : p0 of first node
-			let h0 = rootNode.p0.clone();
-			// end of hermite : p1 of 2nd node
-			let h1 = child.p1.clone();
-
-			// speed vectors
-			let v0 = rootNode.p1.clone().sub(rootNode.p0).normalize();
-			let v1 = child.p1.clone().sub(child.p0).normalize();
-
-
-			// construct circles around curve
-			for (let t = 0; t <= 1; t += 1 / lengthDivisions) {
-				let { p: pt, dp } = this.hermite(h0, h1, v0, v1, t);
-				
-				dp.normalize();
-
-				// take any non colinear vector to construct circle
-				let r = new THREE.Vector3(0, 0, 1);
-				if (Math.abs(dp.dot(r)) > 0.99) {
-					r.set(1, 0, 0); 
-				}
-
-				// vertical and horizontal components 
-				let n1 = new THREE.Vector3().crossVectors(r, dp).normalize();
-				let n2 = new THREE.Vector3().crossVectors(dp, n1).normalize();
-
-				let pointList = [];
-				for (let i = 0; i < radialDivisions; i++) {
-					let theta = (2 * Math.PI * i) / radialDivisions;
-					let lengthI = ((radialDivisions - i) / radialDivisions) * rootNode.a1 + 
-								(i / radialDivisions) * child.a0;
-
-					let offset = n1.clone().multiplyScalar(Math.cos(theta) * lengthI)
-						.add(n2.clone().multiplyScalar(Math.sin(theta) * lengthI));
-					pointList.push(pt.clone().add(offset));
-				}
-				if (!rootNode.sections) rootNode.sections = [];
-				child.sections.push(pointList);
-			}
+	generateSegmentsHermite: function (rootNode, lengthDivisions = 4, radialDivisions = 8) {
+		for (let i = 0; i < rootNode.childNode.length; i++) {
+			this.generateSegmentsHermite(rootNode.childNode[i]);
 		}
-		for ( let i = 0; i < rootNode.childNode.length ; i++ ) {
-			let child = rootNode.childNode[i];
-			this.generateSegmentsHermite(child);
-		}
-	},
 
+		let p = rootNode.parentNode;
+		let v1 = rootNode.p1.clone().sub(rootNode.p0);
+		let v0 = p == null ? v1 : p.p1.clone().sub(p.p0);
 
-	generateSegmentsHermite_______________: function (rootNode, lengthDivisions = 4, radialDivisions = 8) {
-		if (false) {
-			for (let i = 0; i < rootNode.childNode.length; i++) {
-				this.generateSegmentsHermite_______________(rootNode.childNode[i]);
+		//hermite setup
+		let h0 = rootNode.p0.clone();
+		let h1 = rootNode.p1.clone();
+		// t e [0,1]
+		for (let t = 1 / lengthDivisions ; t <= 1; t += 1 / lengthDivisions) {
+
+			branch_length = (rootNode.a1 * (t)) + (rootNode.a0 * (1 - t))
+			
+			let { p: pt, dp } = this.hermite(h0, h1, v0, v1, t);
+
+			dp.normalize();
+			let r = new THREE.Vector3(0, 0, 1);
+			if (Math.abs(dp.dot(r)) > 0.99) {
+				r.set(1, 0, 0); // Avoid collinearity
 			}
-		} else {
-			for (let i = 0; i < rootNode.childNode.length; i++) {
-				this.generateSegmentsHermite_______________(rootNode.childNode[i]);
-			}
 
-			let p = rootNode.parentNode;
-			let h0 = rootNode.p0.clone();
-			let h1 = rootNode.p1.clone();
+			let n1 = new THREE.Vector3().crossVectors(r, dp).normalize();
+			let n2 = new THREE.Vector3().crossVectors(dp, n1).normalize();
 
-			console.log("h1", h1);
-	
-			// potentiel probleme
+			let pointList = [];
+			for (let i = 0; i < radialDivisions; i++) {
+				let theta = (2 * Math.PI * i) / radialDivisions;
+				let lengthI = ((radialDivisions - i) / radialDivisions) * rootNode.a1 + 
+								(i / radialDivisions) * (branch_length);
 
-			let v1 = rootNode.p1.clone().sub(rootNode.p0).normalize();
-			let v0, pa0;
-			if(p == null){
-				v0 = v1;
-				pa0 = rootNode.a0;
+				let offset = n1.clone().multiplyScalar(Math.cos(theta) * lengthI)
+					.add(n2.clone().multiplyScalar(Math.sin(theta) * lengthI));
+				pointList.push(pt.clone().add(offset));
 			}
-			else{
-				v0 = p.p1.clone().sub(p.p0).normalize();
-				pa0 = p.a0;
-			}
-			for (let t = 0; t <= 1; t += 1 / lengthDivisions) {
-				let { p: pt, dp } = this.hermite(h0, h1, v0, v1, t);
-
-				console.log(t, pt);
-	
-				dp.normalize();
-				let r = new THREE.Vector3(0, 0, 1);
-				if (Math.abs(dp.dot(r)) > 0.99) {
-					r.set(1, 0, 0); // Avoid collinearity
-				}
-	
-				let n1 = new THREE.Vector3().crossVectors(r, dp).normalize();
-				let n2 = new THREE.Vector3().crossVectors(dp, n1).normalize();
-	
-				let pointList = [];
-				for (let i = 0; i < radialDivisions; i++) {
-					let theta = (2 * Math.PI * i) / radialDivisions;
-					let lengthI = ((radialDivisions - i) / radialDivisions) * rootNode.a1 + 
-								  (i / radialDivisions) * pa0;
-	
-					let offset = n1.clone().multiplyScalar(Math.cos(theta) * lengthI)
-						.add(n2.clone().multiplyScalar(Math.sin(theta) * lengthI));
-					pointList.push(pt.clone().add(offset));
-				}
-				if (!rootNode.sections) rootNode.sections = [];
-				rootNode.sections.push(pointList);
-			}
+			if (!rootNode.sections) rootNode.sections = [];
+			rootNode.sections.push(pointList);
 		}
 	},
 
