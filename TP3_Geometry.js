@@ -61,7 +61,7 @@ TP3.Geometry = {
 
 	generateSegmentsHermite: function (rootNode, lengthDivisions = 4, radialDivisions = 8) {
 		for (let i = 0; i < rootNode.childNode.length; i++) {
-			this.generateSegmentsHermite(rootNode.childNode[i]);
+			this.generateSegmentsHermite(rootNode.childNode[i], lengthDivisions, radialDivisions);
 		}
 
 		let p = rootNode.parentNode;
@@ -72,7 +72,8 @@ TP3.Geometry = {
 		let h0 = rootNode.p0.clone();
 		let h1 = rootNode.p1.clone();
 		// t e [0,1]
-		for (let t = 1 / lengthDivisions ; t <= 1; t += 1 / lengthDivisions) {
+		rootNode.sections.push([rootNode.p0])
+		for (let t = p == null ? 0 : 1 / lengthDivisions ; t <= 1; t += 1 / lengthDivisions) {
 
 			branch_length = (rootNode.a1 * (t)) + (rootNode.a0 * (1 - t))
 			
@@ -90,11 +91,11 @@ TP3.Geometry = {
 			let pointList = [];
 			for (let i = 0; i < radialDivisions; i++) {
 				let theta = (2 * Math.PI * i) / radialDivisions;
-				let lengthI = ((radialDivisions - i) / radialDivisions) * rootNode.a1 + 
-								(i / radialDivisions) * (branch_length);
+				let lengthI = (rootNode.a1 * (t)) + (rootNode.a0 * (1 - t));
 
-				let offset = n1.clone().multiplyScalar(Math.cos(theta) * lengthI)
-					.add(n2.clone().multiplyScalar(Math.sin(theta) * lengthI));
+				let offset = n1.clone()
+								.multiplyScalar(Math.cos(theta) * lengthI)
+								.add(n2.clone().multiplyScalar(Math.sin(theta) * lengthI));
 				pointList.push(pt.clone().add(offset));
 			}
 			if (!rootNode.sections) rootNode.sections = [];

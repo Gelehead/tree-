@@ -96,9 +96,63 @@ TP3.Render = {
 
 	},
 
-	drawTreeHermite: function (rootNode, scene, alpha, leavesCutoff = 0.1, leavesDensity = 10, applesProbability = 0.05, matrix = new THREE.Matrix4()) {
-		//TODO
+	traceCylinder: function (section_1, section_2){
+		const vertices = [];	
+		for (let j = 0; j < section_1.length; j++) {
+			const nextJ = (j + 1) % section_1.length;
+
+			// Triangle 1
+			vertices.push(
+				section_2[j].x, section_2[j].y, section_2[j].z,  
+				section_1[j].x, section_1[j].y, section_1[j].z,  
+				section_1[nextJ].x, section_1[nextJ].y, section_1[nextJ].z 
+			);
+
+			// Triangle 2
+			vertices.push(
+				section_2[j].x, section_2[j].y, section_2[j].z, 
+				section_1[nextJ].x, section_1[nextJ].y, section_1[nextJ].z, 
+				section_2[nextJ].x, section_2[nextJ].y, section_2[nextJ].z  
+			);
+		}
+
+		return vertices;
 	},
+
+	drawCylinder: function(vertices){
+		const wood_mat = new THREE.MeshLambertMaterial({ color: 0x8B5A2B });
+
+		const f32vertices = new Float32Array(vertices);
+		const geometry = new THREE.BufferGeometry();
+		geometry.setAttribute("position", new THREE.BufferAttribute(f32vertices, 3));
+		
+		geometry.computeVertexNormals();
+
+		const log = new THREE.Mesh(geometry, wood_mat);
+		scene.add(log);
+	},
+
+	drawTreeHermite: function (rootNode, scene, alpha, leavesCutoff = 0.1, leavesDensity = 10, applesProbability = 0.05, matrix = new THREE.Matrix4()) {
+		if (!rootNode || !rootNode.sections || rootNode.sections.length < 2) {return;}	
+	
+		for (let i = 0; i < rootNode.sections.length - 1; i++) {
+			const vertices = this.traceCylinder(rootNode.sections[i], rootNode.sections[i + 1])
+			this.drawCylinder(vertices);
+		}
+	
+		// Recurse into child nodes
+		if (rootNode.childNode && rootNode.childNode.length > 0) {
+			for (const child of rootNode.childNode) {
+				console.log(rootNode.sections);	
+				const vert = this.traceCylinder(rootNode.sections[rootNode.sections.length - 1], child.sections[1]);
+				this.drawCylinder(vert);
+				this.drawTreeHermite(child, scene, alpha, leavesCutoff, leavesDensity, applesProbability, matrix);
+			}
+		}
+	},
+	
+	
+	
 
 	updateTreeHermite: function (trunkGeometryBuffer, leavesGeometryBuffer, applesGeometryBuffer, rootNode) {
 		//TODO
