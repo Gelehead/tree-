@@ -101,7 +101,7 @@ TP3.Physics = {
 		const [ax2, ang2] = TP3.Geometry.findRotation(v1, v0);
 
 		var rest = ax2.clone().multiplyScalar(-Math.sqrt(ang2)/50);
-		rest.multiplyScalar(1000*node.a0);
+		rest.multiplyScalar(5000*node.a0);
 		node.vel.add(rest);
 		node.vel.multiplyScalar(0.7);
 
