@@ -67,11 +67,6 @@ TP3.Physics = {
 		v += Math.cos(2.5 * time + 56485) * 2;
 		v += Math.cos(5 * time + 56485) * 0.4;
 
-		// Ajouter le vent
-		node.vel.add(new THREE.Vector3(u / Math.sqrt(node.mass), 0, v / Math.sqrt(node.mass)).multiplyScalar(dt));
-		// Ajouter la gravite
-		node.vel.add(new THREE.Vector3(0, -node.mass, 0).multiplyScalar(dt));
-
 		var p1 = node.p1.clone();
 		const vt = node.vel.clone().multiplyScalar(dt);
 		var new_p1 = p1.clone().add(vt);
@@ -95,13 +90,21 @@ TP3.Physics = {
 		}
 
 
+
+		// Ajouter le vent
+		node.vel.add(new THREE.Vector3(u / Math.sqrt(node.mass), 0, v / Math.sqrt(node.mass)).multiplyScalar(dt));
+		// Ajouter la gravite
+		node.vel.add(new THREE.Vector3(0, -node.mass, 0).multiplyScalar(dt));
+
+
 		v0 = new THREE.Vector3().subVectors(p1, node.p0).normalize();
 		v1 = new THREE.Vector3().subVectors(node.p1, node.p0).normalize();
 
 		const [ax2, ang2] = TP3.Geometry.findRotation(v1, v0);
 
-		var rest = ax2.clone().multiplyScalar(-Math.sqrt(ang2)/50);
-		rest.multiplyScalar(5000*node.a0);
+		var rest = ax2.clone().multiplyScalar(-Math.sqrt(ang2)/15);
+
+		rest.multiplyScalar(1000*node.a0);
 		node.vel.add(rest);
 		node.vel.multiplyScalar(0.7);
 

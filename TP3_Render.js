@@ -42,8 +42,11 @@ TP3.Render = {
 
 			const leaves = [];
 
+			const apples = [];
+
 			// Creation of leaves
-			if(node.a1 <alpha*leavesCutoff){
+			if(node.a1 < alpha*leavesCutoff){
+
 				for(let j = 0; j < leavesDensity; j++){
 					const leafPos = leafPosition(length, node.childNode.length === 0);
 					const mat2 = new THREE.Matrix4();
@@ -56,44 +59,53 @@ TP3.Render = {
 					leafGeometry.applyMatrix(mat2);
 					leaves.push(leafGeometry);
 				}
+				if(Math.random()*100 < applesProbability*100){
+					const appleGeometry = new THREE.BoxBufferGeometry(alpha, alpha, alpha);
+					appleGeometry.applyMatrix(transformationMatrix);
+					apples.push(appleGeometry);
+				}
 			}
 
 
-			return [[cylinder], leaves];
+			return [[cylinder], leaves, apples];
 
 		}
 
 		// Recursion of tree creation
 		function getTreeGeometry(node){
-			var branches = [], leaves =  [];
+			var branches = [], leaves =  [], apples = [];
 			if(node){
-				[branches, leaves] = getCylinder(node, scene, alpha, radialDivisions);
+				[branches, leaves, apples] = getCylinder(node, scene, alpha, radialDivisions);
 				for(let i = 0; i < node.childNode.length; i++){
-					const [lc, lv] = getTreeGeometry(node.childNode[i], scene, alpha, radialDivisions);
+					const [lc, lv, la] = getTreeGeometry(node.childNode[i], scene, alpha, radialDivisions);
 					branches = branches.concat(lc);
-					leaves = leaves.concat(lv)
+					leaves = leaves.concat(lv);
+					apples = apples.concat(la);
 				}
 			}
-			return [branches, leaves]
+			return [branches, leaves, apples]
 		}
 
 
 		// Fusion of geometries
-		const [Tgeometries, Lgeometries] = getTreeGeometry(rootNode, scene, alpha, radialDivisions);
+		const [Tgeometries, Lgeometries, Ageometries] = getTreeGeometry(rootNode, scene, alpha, radialDivisions);
 
 		const treeGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(Tgeometries, false);
 		const leavesGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(Lgeometries, false);
+		const appleGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(Ageometries, false);
 
 		// Creation of meshes
 		const bmat = new THREE.MeshLambertMaterial({color: 0x8B5A2B});
 		const lmat = new THREE.MeshPhongMaterial({color: 0x3A5F0B});
+		const amat = new THREE.MeshPhongMaterial({color: 0x5F0B0B});
 		const tree = new THREE.Mesh(treeGeometry, bmat);
-		const leavesMesh = new THREE.Mesh(leavesGeometry, lmat)
+		const leavesMesh = new THREE.Mesh(leavesGeometry, lmat);
+		const applesMesh = new THREE.Mesh(appleGeometry, amat);
 
 		// Displaying tree and leaves
 		scene.add(tree);
 		scene.add(leavesMesh);
-
+		scene.add(applesMesh);
 	},
 
 	traceCylinder: function (section_1, section_2){
