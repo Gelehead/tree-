@@ -43,7 +43,7 @@ TP3.Render = {
 			const leaves = [];
 
 			// Creation of leaves
-			if(node.a1 <alpha*leavesCutoff){
+			if(node.a0 <alpha*leavesCutoff){
 				for(let j = 0; j < leavesDensity; j++){
 					const leafPos = leafPosition(length, node.childNode.length === 0);
 					const mat2 = new THREE.Matrix4();
@@ -88,7 +88,7 @@ TP3.Render = {
 		const bmat = new THREE.MeshLambertMaterial({color: 0x8B5A2B});
 		const lmat = new THREE.MeshPhongMaterial({color: 0x3A5F0B});
 		const tree = new THREE.Mesh(treeGeometry, bmat);
-		const leavesMesh = new THREE.Mesh(leavesGeometry, lmat)
+		const leavesMesh = new THREE.Mesh(leavesGeometry, lmat);
 
 		// Displaying tree and leaves
 		scene.add(tree);
@@ -96,6 +96,7 @@ TP3.Render = {
 
 	},
 
+	// give vertices to draw
 	traceCylinder: function (section_1, section_2){
 		const vertices = [];	
 		for (let j = 0; j < section_1.length; j++) {
@@ -119,6 +120,8 @@ TP3.Render = {
 		return vertices;
 	},
 
+	// handles scene drawing 
+	// TODO : could use some Buffer usage, adding each branch to a buffer and THEN add to scene
 	drawCylinder: function(vertices){
 		const wood_mat = new THREE.MeshLambertMaterial({ color: 0x8B5A2B });
 
@@ -128,31 +131,160 @@ TP3.Render = {
 		
 		geometry.computeVertexNormals();
 
-		const log = new THREE.Mesh(geometry, wood_mat);
-		scene.add(log);
+		const branch = new THREE.Mesh(geometry, wood_mat);
+		scene.add(branch);
 	},
 
-	drawTreeHermite: function (rootNode, scene, alpha, leavesCutoff = 0.1, leavesDensity = 10, applesProbability = 0.05, matrix = new THREE.Matrix4()) {
-		if (!rootNode || !rootNode.sections || rootNode.sections.length < 2) {return;}	
-	
+	// Generate leaves for the given branch
+	drawLeaves: function(alpha, leavesDensity, rootNode) {
+		const leaves = [];
+		for (let j = 0; j < leavesDensity; j++) {
+			// Random position within a cube of size alpha/2 around the branch
+			const offsetX = (Math.random() - 0.5) * alpha * 3;
+			const offsetY = (Math.random() - 0.5) * alpha * 3;
+			const offsetZ = (Math.random() - 0.5) * alpha * 3;
+
+
+			// Random position on the branch, x e [0,1], the position between p0 and p1
+			const x = Math.random();
+			const branchPosition = rootNode.p0.clone()
+									.multiplyScalar(x)
+									.add(
+										rootNode.p1.clone()
+											.multiplyScalar((1-x))
+			);
+
+			const offset = new THREE.Vector3(offsetX, offsetY, offsetZ);
+			const leafPosition = branchPosition.add(offset);
+
+			// Create leaf geometry and randomly rotate it
+			const leafGeometry = new THREE.PlaneBufferGeometry(alpha, alpha);
+			leafGeometry.rotateX(Math.random() * Math.PI);
+			leafGeometry.rotateY(Math.random() * Math.PI);
+			leafGeometry.rotateZ(Math.random() * Math.PI);
+
+			// Apply translation to the leaf geometry
+			const transform = new THREE.Matrix4().makeTranslation(
+				leafPosition.x,
+				leafPosition.y,
+				leafPosition.z
+			);
+			leafGeometry.applyMatrix4(transform);
+
+			leaves.push(leafGeometry);
+		}
+		return leaves;
+	},
+
+	// Generate apples (if required)
+	drawApples: function(alpha, applesProbability, position) {
+		if (Math.random() > applesProbability) return null; // Skip apple generation
+
+		// code repetition, womp womp
+		const offsetX = (Math.random() - 0.5) * alpha;
+		const offsetY = ((Math.random() - 0.5) * alpha) / 2;
+		const offsetZ = (Math.random() - 0.5) * alpha;
+
+		const offset = new THREE.Vector3(offsetX, offsetY, offsetZ);
+		const applePosition = position.add(offset);
+
+		const appleGeometry = new THREE.BoxBufferGeometry(alpha, alpha, alpha);
+		appleGeometry.rotateX(Math.random() * Math.PI);
+		appleGeometry.rotateY(Math.random() * Math.PI);
+		appleGeometry.rotateZ(Math.random() * Math.PI);
+
+		const transform = new THREE.Matrix4().makeTranslation(
+			applePosition.x,
+			applePosition.y,
+			applePosition.z
+		);
+		appleGeometry.applyMatrix4(transform);
+		return appleGeometry;
+	},
+
+	// Principal drawing function
+	drawTreeHermite: function(
+		rootNode,
+		scene,
+		alpha,
+		leavesCutoff = 0.1,
+		leavesDensity = 10,
+		applesProbability = 0.05,
+		matrix = new THREE.Matrix4()
+	) {
+		let leaves = [];
+		let apples = [];
+
+		// Draw branches
 		for (let i = 0; i < rootNode.sections.length - 1; i++) {
-			const vertices = this.traceCylinder(rootNode.sections[i], rootNode.sections[i + 1])
+			const vertices = this.traceCylinder(
+				rootNode.sections[i],
+				rootNode.sections[i + 1]
+			);
 			this.drawCylinder(vertices);
 		}
-	
+
+		// Handle terminal branches and thin branches for leaves and apples
+		if (
+			rootNode.a0 < (alpha * leavesCutoff) ||
+			rootNode.childNode.length === 0
+		) {
+			const branchLeaves = this.drawLeaves(alpha, leavesDensity, rootNode);
+			leaves.push(...branchLeaves);
+
+			const branchApple = this.drawApples(alpha, applesProbability, rootNode.p1);
+			if (branchApple) apples.push(branchApple);
+		}
+
 		// Recurse into child nodes
 		if (rootNode.childNode && rootNode.childNode.length > 0) {
 			for (const child of rootNode.childNode) {
-				console.log(rootNode.sections);	
-				const vert = this.traceCylinder(rootNode.sections[rootNode.sections.length - 1], child.sections[1]);
+				const vert = this.traceCylinder(rootNode.sections[rootNode.sections.length - 1], child.sections[1]				);
 				this.drawCylinder(vert);
-				this.drawTreeHermite(child, scene, alpha, leavesCutoff, leavesDensity, applesProbability, matrix);
+
+				// Gather leaves and apples from child nodes
+				const childResults = this.drawTreeHermite(
+					child,
+					scene,
+					alpha,
+					leavesCutoff,
+					leavesDensity,
+					applesProbability,
+					matrix
+				);
+				leaves.push(...childResults.leaves);
+				apples.push(...childResults.apples);
 			}
 		}
+
+		// Final rendering for the root node
+		if (!rootNode.parentNode) {
+			// Merge and add leaves to the scene
+			const leavesGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(
+				leaves,
+				false
+			);
+			const leafMaterial = new THREE.MeshPhongMaterial({
+				color: 0x3a5f0b,
+				side: THREE.DoubleSide,
+			});
+			const leavesMesh = new THREE.Mesh(leavesGeometry, leafMaterial);
+			scene.add(leavesMesh);
+
+			// Merge and add apples to the scene
+			if (apples.length > 0) {
+				const applesGeometry =
+					THREE.BufferGeometryUtils.mergeBufferGeometries(apples, false);
+				const appleMaterial = new THREE.MeshPhongMaterial({
+					color: 0xff0000,
+				});
+				const applesMesh = new THREE.Mesh(applesGeometry, appleMaterial);
+				scene.add(applesMesh);
+			}
+		}
+
+		return { leaves, apples };
 	},
-	
-	
-	
 
 	updateTreeHermite: function (trunkGeometryBuffer, leavesGeometryBuffer, applesGeometryBuffer, rootNode) {
 		//TODO
