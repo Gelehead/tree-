@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="bdeeff83-d8ce-4ae9-a8ef-d5b127c62ceb" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/TP3_Physics.js" beforeDir="false" afterPath="$PROJECT_DIR$/TP3_Physics.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TP3_Render.js" beforeDir="false" afterPath="$PROJECT_DIR$/TP3_Render.js" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="2p7mtmnsAFk4rJidsO9wCoVc5c5" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;JavaScript Debug.TP3_A2_RenderRough.html.executor&quot;: &quot;Run&quot;,
+    &quot;JavaScript Debug.TP3_B1_Segments.html.executor&quot;: &quot;Run&quot;,
+    &quot;JavaScript Debug.TP3_C1_SkeletonAnimate.html.executor&quot;: &quot;Run&quot;,
+    &quot;Node.js.TP3_Physics.js.executor&quot;: &quot;Run&quot;,
+    &quot;Node.js.TP3_Render.js.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/djilde/Documents/L3/S1/infographie/TP3/tree-&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager" selected="JavaScript Debug.TP3_A2_RenderRough.html">
+    <configuration name="TP3_A2_RenderRough.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/tree-/TP3_A2_RenderRough.html" useBuiltInWebServerPort="true">
+      <method v="2" />
+    </configuration>
+    <configuration name="TP3_B1_Segments.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/tree-/TP3_B1_Segments.html" useBuiltInWebServerPort="true">
+      <method v="2" />
+    </configuration>
+    <configuration name="TP3_C1_SkeletonAnimate.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/tree-/TP3_C1_SkeletonAnimate.html" useBuiltInWebServerPort="true">
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JavaScript Debug.TP3_A2_RenderRough.html" />
+        <item itemvalue="JavaScript Debug.TP3_C1_SkeletonAnimate.html" />
+        <item itemvalue="JavaScript Debug.TP3_B1_Segments.html" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-7c0b70fcd90d-JavaScript-WS-242.21829.149" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="bdeeff83-d8ce-4ae9-a8ef-d5b127c62ceb" name="Changes" comment="" />
+      <created>1732125704686</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1732125704686</updated>
+      <workItem from="1732125705743" duration="6627000" />
+      <workItem from="1732573547505" duration="5332000" />
+      <workItem from="1732578889919" duration="67000" />
+      <workItem from="1732594733461" duration="3139000" />
+      <workItem from="1732729414992" duration="7525000" />
+      <workItem from="1732739718453" duration="570000" />
+      <workItem from="1732904043234" duration="1035000" />
+      <workItem from="1733024158585" duration="1151000" />
+      <workItem from="1733025319290" duration="5215000" />
+      <workItem from="1733090073198" duration="2922000" />
+      <workItem from="1733294076398" duration="604000" />
+      <workItem from="1733336141418" duration="7164000" />
+      <workItem from="1733519263846" duration="271000" />
+      <workItem from="1733547129125" duration="2013000" />
+      <workItem from="1733600064936" duration="1093000" />
+      <workItem from="1733601169817" duration="630000" />
+      <workItem from="1733686470800" duration="3581000" />
+      <workItem from="1733776920500" duration="689000" />
+      <workItem from="1733879484392" duration="259000" />
+      <workItem from="1733965801634" duration="729000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
