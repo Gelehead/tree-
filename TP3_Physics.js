@@ -57,6 +57,10 @@ TP3.Physics = {
 		}
 	},
 
+	applyForces_ : function(node, dt, time) {
+
+	},
+
 	applyForces: function (node, dt, time) {
 
 		var u = Math.sin(1 * time) * 4;
@@ -94,7 +98,7 @@ TP3.Physics = {
 		// Ajouter le vent
 		node.vel.add(new THREE.Vector3(u / Math.sqrt(node.mass), 0, v / Math.sqrt(node.mass)).multiplyScalar(dt));
 		// Ajouter la gravite
-		node.vel.add(new THREE.Vector3(0, -node.mass, 0).multiplyScalar(dt));
+		node.vel.add(new THREE.Vector3(0, -0.01 * node.mass, 0).multiplyScalar(dt));
 
 
 		v0 = new THREE.Vector3().subVectors(p1, node.p0).normalize();
