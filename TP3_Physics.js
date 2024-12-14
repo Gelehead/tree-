@@ -108,7 +108,7 @@ TP3.Physics = {
 
 		var rest = ax2.clone().multiplyScalar(-Math.sqrt(ang2)/15);
 
-		rest.multiplyScalar(1000*node.a0);
+		rest.multiplyScalar(100*node.a0);
 		node.vel.add(rest);
 		node.vel.multiplyScalar(0.7);
 
