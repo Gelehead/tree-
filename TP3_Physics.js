@@ -15,6 +15,8 @@ TP3.Physics = {
 			}
 
 			currentNode.vel = new THREE.Vector3();
+			currentNode.matrixRotation = new THREE.Matrix4().set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+			currentNode.matrixTranslation = new THREE.Matrix4().set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 			currentNode.strength = currentNode.a0;
 		}
 	},
@@ -38,18 +40,23 @@ TP3.Physics = {
 		if(node){
 			const p0 = node.p0;
 
+			// Rotation dans l'espace objet
 			const t_1 = new THREE.Matrix4().makeTranslation(-node.p0.x, -node.p0.y, -node.p0.z);
 			const t_2 = new THREE.Matrix4().makeTranslation(node.p0.x, node.p0.y, node.p0.z);
 			node.p1.applyMatrix4(t_1);
 			node.p1.applyMatrix4(rot);
 			node.p1.applyMatrix4(t_2);
 
+			node.matrixRotation.multiply(rot);
+
+			// Translation pour nouvelle position selon transformation parent
 			const t_vect = new THREE.Vector3().subVectors(node.parentNode.p1, p0);
 			const trans2 = new THREE.Matrix4().makeTranslation(t_vect.x, t_vect.y, t_vect.z);
 
-
 			node.p0.applyMatrix4(trans2);
 			node.p1.applyMatrix4(trans2);
+
+			node.matrixTranslation.multiply(trans2);
 
 			for(var i = 0; i < node.childNode.length; i++){
 				this.propagateRotation(node.childNode[i], rot);
@@ -71,9 +78,15 @@ TP3.Physics = {
 		v += Math.cos(2.5 * time + 56485) * 2;
 		v += Math.cos(5 * time + 56485) * 0.4;
 
+
+		// Projection de mouvement
+
+		// Copies des points nécessaires
 		var p1 = node.p1.clone();
 		const vt = node.vel.clone().multiplyScalar(dt);
 		var new_p1 = p1.clone().add(vt);
+
+		// Calcul de la rotation nécessaire
 		var v1 = new THREE.Vector3().subVectors(new_p1, node.p0).normalize();
 		var v0 = new THREE.Vector3().subVectors(p1, node.p0).normalize();
 
@@ -81,6 +94,7 @@ TP3.Physics = {
 		const quat = new THREE.Quaternion().setFromAxisAngle(ax, ang);
 		const rot = new THREE.Matrix4().makeRotationFromQuaternion(quat);
 
+		// Application rotation
 		const t1 = new THREE.Matrix4().makeTranslation(-node.p0.x, -node.p0.y, -node.p0.z);
 		const t2 = new THREE.Matrix4().makeTranslation(node.p0.x, node.p0.y, node.p0.z);
 
@@ -88,7 +102,9 @@ TP3.Physics = {
 		node.p1.applyMatrix4(rot);
 		node.p1.applyMatrix4(t2);
 
+		node.matrixRotation.multiply(rot);
 
+		// Propagation
 		for(var e = 0; e < node.childNode.length; e++){
 			this.propagateRotation(node.childNode[e], rot);
 		}
@@ -101,6 +117,7 @@ TP3.Physics = {
 		node.vel.add(new THREE.Vector3(0, -0.01 * node.mass, 0).multiplyScalar(dt));
 
 
+		// Force de restitution
 		v0 = new THREE.Vector3().subVectors(p1, node.p0).normalize();
 		v1 = new THREE.Vector3().subVectors(node.p1, node.p0).normalize();
 
@@ -108,9 +125,16 @@ TP3.Physics = {
 
 		var rest = ax2.clone().multiplyScalar(-Math.sqrt(ang2)/15);
 
-		rest.multiplyScalar(1000*node.a0);
+		rest.multiplyScalar(100*node.a0);
 		node.vel.add(rest);
-		node.vel.multiplyScalar(0.7);
+
+		if(node.childNode.length === 0){
+			node.vel.multiplyScalar(0.15);
+		} else {
+			node.vel.multiplyScalar(0.7);
+		}
+
+
 
 
 		// TODO: Projection du mouvement, force de restitution et amortissement de la velocite

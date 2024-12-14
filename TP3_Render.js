@@ -279,10 +279,10 @@ TP3.Render = {
 		if (!rootNode.parentNode) {
 			// Create a parent group for the entire tree
 			const tree = new THREE.Group();
-
+			let branchesGeometry, leavesGeometry, applesGeometry;
 			// Merge and add branches to the tree
 			if (branches.length > 0) {
-				const branchesGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(
+				branchesGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(
 					branches,
 					false
 				);
@@ -296,7 +296,7 @@ TP3.Render = {
 
 			// Merge and add leaves to the tree
 			if (leaves.length > 0) {
-				const leavesGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(
+				leavesGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(
 					leaves,
 					false
 				);
@@ -311,7 +311,7 @@ TP3.Render = {
 
 			// Merge and add apples to the tree
 			if (apples.length > 0) {
-				const applesGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(
+				applesGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(
 					apples,
 					false
 				);
@@ -324,13 +324,54 @@ TP3.Render = {
 			}
 			
 			scene.add(tree);
+			return [branchesGeometry, leavesGeometry, applesGeometry];
 		}
 
 		return { leaves, apples, branches };
 	},
 
+	updateBranchHermite: function (trunkIndex, trunkGeometryBuffer, node){
+
+		// Computing the amount of points in the vertices contained in node
+		let amount = 0;
+		for(let i = 0; i < node.sections.length; i++){
+			for(let j = 0; j < node.sections[i].length; j++){
+				amount += 18;
+			}
+		}
+
+		// Applying the transformation matrices of the node on the points
+		let pointVector;
+		for(let t = trunkIndex; t < trunkIndex + amount; t+=3){
+			pointVector = new THREE.Vector3(trunkGeometryBuffer[t], trunkGeometryBuffer[t + 1], trunkGeometryBuffer[t + 2]);
+
+			pointVector.applyMatrix4(node.matrixRotation);
+			pointVector.applyMatrix4(node.matrixTranslation);
+
+			[t1, t2, t3] = pointVector.toArray();
+			trunkGeometryBuffer[t] = t1;
+			trunkGeometryBuffer[t + 1] = t2;
+			trunkGeometryBuffer[t + 2] = t3;
+		}
+
+		// Returning the index at which we stopped in trunkGeometryBuffer for the next node
+		return trunkIndex+amount;
+	},
+
+	// Auxiliary recursion function that goes through trunkGeometryBuffer with an increasing index that
+	// goes through the entire tree
+	updateTreeAux: function(trunkGeometryBuffer, node, trunkIndex){
+		if(node){
+			trunkIndex = this.updateBranchHermite(trunkIndex, trunkGeometryBuffer, node);
+			for(const child of node.childNode){
+				trunkIndex = this.updateTreeAux(trunkGeometryBuffer, child, trunkIndex);
+			}
+		}
+		return trunkIndex;
+	},
+
 	updateTreeHermite: function (trunkGeometryBuffer, leavesGeometryBuffer, applesGeometryBuffer, rootNode) {
-		//TODO
+		this.updateTreeAux(trunkGeometryBuffer, rootNode, 0);
 	},
 
 	drawTreeSkeleton: function (rootNode, scene, color = 0xffffff, matrix = new THREE.Matrix4()) {

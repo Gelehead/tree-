@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bdeeff83-d8ce-4ae9-a8ef-d5b127c62ceb" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/TP3_Physics.js" beforeDir="false" afterPath="$PROJECT_DIR$/TP3_Physics.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/TP3_Render.js" beforeDir="false" afterPath="$PROJECT_DIR$/TP3_Render.js" afterDir="false" />
     </list>
@@ -24,38 +25,48 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;JavaScript Debug.TP3_A2_RenderRough.html.executor&quot;: &quot;Run&quot;,
-    &quot;JavaScript Debug.TP3_B1_Segments.html.executor&quot;: &quot;Run&quot;,
-    &quot;JavaScript Debug.TP3_C1_SkeletonAnimate.html.executor&quot;: &quot;Run&quot;,
-    &quot;Node.js.TP3_Physics.js.executor&quot;: &quot;Run&quot;,
-    &quot;Node.js.TP3_Render.js.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/djilde/Documents/L3/S1/infographie/TP3/tree-&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "JavaScript Debug.TP3_A2_RenderRough.html.executor": "Run",
+    "JavaScript Debug.TP3_B1_Segments.html.executor": "Run",
+    "JavaScript Debug.TP3_B2_RenderHermite.html.executor": "Run",
+    "JavaScript Debug.TP3_C1_SkeletonAnimate.html.executor": "Run",
+    "JavaScript Debug.TP3_C2_HermiteAnimate.html.executor": "Run",
+    "Node.js.TP3_Physics.js.executor": "Run",
+    "Node.js.TP3_Render.js.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/home/djilde/Documents/L3/S1/infographie/TP3/tree-",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
-  <component name="RunManager" selected="JavaScript Debug.TP3_A2_RenderRough.html">
+}]]></component>
+  <component name="RunManager" selected="JavaScript Debug.TP3_C1_SkeletonAnimate.html">
     <configuration name="TP3_A2_RenderRough.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/tree-/TP3_A2_RenderRough.html" useBuiltInWebServerPort="true">
       <method v="2" />
     </configuration>
     <configuration name="TP3_B1_Segments.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/tree-/TP3_B1_Segments.html" useBuiltInWebServerPort="true">
       <method v="2" />
     </configuration>
+    <configuration name="TP3_B2_RenderHermite.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/tree-/TP3_B2_RenderHermite.html" useBuiltInWebServerPort="true">
+      <method v="2" />
+    </configuration>
     <configuration name="TP3_C1_SkeletonAnimate.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/tree-/TP3_C1_SkeletonAnimate.html" useBuiltInWebServerPort="true">
+      <method v="2" />
+    </configuration>
+    <configuration name="TP3_C2_HermiteAnimate.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/tree-/TP3_C2_HermiteAnimate.html" useBuiltInWebServerPort="true">
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JavaScript Debug.TP3_A2_RenderRough.html" />
         <item itemvalue="JavaScript Debug.TP3_C1_SkeletonAnimate.html" />
+        <item itemvalue="JavaScript Debug.TP3_C2_HermiteAnimate.html" />
+        <item itemvalue="JavaScript Debug.TP3_B2_RenderHermite.html" />
+        <item itemvalue="JavaScript Debug.TP3_A2_RenderRough.html" />
         <item itemvalue="JavaScript Debug.TP3_B1_Segments.html" />
       </list>
     </recent_temporary>
@@ -94,7 +105,8 @@
       <workItem from="1733686470800" duration="3581000" />
       <workItem from="1733776920500" duration="689000" />
       <workItem from="1733879484392" duration="259000" />
-      <workItem from="1733965801634" duration="729000" />
+      <workItem from="1733965801634" duration="1489000" />
+      <workItem from="1734123991561" duration="22558000" />
     </task>
     <servers />
   </component>
